@@ -263,9 +263,10 @@ class _Connection(object):
 class TCPClient(_Connection):
     rbufsize = -1
     wbufsize = -1
-    def __init__(self, address, source_address=None):
+    def __init__(self, address, source_address=None, timeout=None):
         self.address = Address.wrap(address)
         self.source_address = Address.wrap(source_address) if source_address else None
+        self.timeout = timeout
         self.connection, self.rfile, self.wfile = None, None, None
         self.cert = None
         self.ssl_established = False
@@ -306,6 +307,7 @@ class TCPClient(_Connection):
     def connect(self):
         try:
             connection = socket.socket(self.address.family, socket.SOCK_STREAM)
+            connection.settimeout(timeout)
             if self.source_address:
                 connection.bind(self.source_address())
             connection.connect(self.address())
